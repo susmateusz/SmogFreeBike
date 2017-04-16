@@ -1,0 +1,79 @@
+<h1>Example App: Home</h1>
+<p></p>
+
+<div id="map" class="map"></div>
+<label>top</label><input type="text" id="top">
+<label>right</label><input type="text" id="right"><br>
+<label>bottom</label><input type="text" id="bottom">
+<label>left</label><input type="text" id="left">
+<div>
+    <ul id="stations"></ul>
+</div>
+<script type="text/javascript">
+    var map = new ol.Map({
+        target: 'map',
+        layers: [
+            new ol.layer.Tile({
+                source: new ol.source.OSM()
+            })
+        ],
+        view: new ol.View({
+            //projection: 'EPSG:4326',
+            center: ol.proj.fromLonLat([17, 51]),
+            zoom: 10
+        })
+    });
+
+    function display(id, value) {
+        document.getElementById(id).value = value.toFixed(2);
+    }
+
+    function wrapLon(value) {
+        var worlds = Math.floor((value + 180) / 360);
+        return value - (worlds * 360);
+    }
+
+    function onMoveEnd(evt) {
+        var map = evt.map;
+        var extent = map.getView().calculateExtent(map.getSize());
+        var bottomLeft = ol.proj.transform(ol.extent.getBottomLeft(extent),
+                'EPSG:3857', 'EPSG:4326');
+        var topRight = ol.proj.transform(ol.extent.getTopRight(extent),
+                'EPSG:3857', 'EPSG:4326');
+        display('left', wrapLon(bottomLeft[0]));
+        display('bottom', bottomLeft[1]);
+        display('right', wrapLon(topRight[0]));
+        display('top', topRight[1]);
+
+        var coords = [];
+        coords.push(bottomLeft[1]);
+        coords.push(wrapLon(bottomLeft[0]));
+        coords.push(topRight[1]);
+        coords.push(wrapLon(topRight[0]));
+
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "http://localhost:3000/aqi/stations",
+            data: {'coords' : coords},
+            //data: {'coords' : 'hallo!'},
+            success: function(data) {
+                var ul_stations = document.getElementById('stations');
+                while (ul_stations.firstChild) {
+                    ul_stations.removeChild(ul_stations.firstChild);
+                }
+                for (var i = 0; i < data["stations"].length; i++) {
+                    var item = document.createElement('li');
+                    var station = JSON.stringify(data["stations"][i]);
+                    item.appendChild(document.createTextNode(station));
+                    ul_stations.appendChild(item);
+                }
+            },
+            dataType: 'json'
+        });
+    }
+
+    map.on('moveend',onMoveEnd);
+
+
+</script>

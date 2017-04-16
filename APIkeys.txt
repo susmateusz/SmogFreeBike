@@ -1,2 +1,3 @@
 AIzaSyD8mwcCNPvRC3GzVqjLN825If-zB94sXnU //google maps api
 4pGVZ2T5yFL5VhWoSgylbTJm2MGN1rgC // MapQuest API
+5769436f89cbfa350d4761c352b66cfc939d7721 // Air Quality Index
