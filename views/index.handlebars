@@ -1,6 +1,9 @@
-<h1>Example App: Home</h1>
+<h1>BajkDojadę</h1>
 <p></p>
 
+<label>From:</label><input type="text" id="from-point">
+<label>To:</label><input type="text" id="to-point">
+<button id="find-button" onclick="getSearchingCoordinates()">Find</button>
 <div id="map" class="map"></div>
 <label>top</label><input type="text" id="top">
 <label>right</label><input type="text" id="right"><br>
@@ -32,6 +35,41 @@
         var worlds = Math.floor((value + 180) / 360);
         return value - (worlds * 360);
     }
+
+
+
+    function getSearchingCoordinates() {
+        var fromAddress = document.getElementById("from-point").value;
+        var toAddress = document.getElementById("to-point").value;
+
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "http://nominatim.openstreetmap.org/search?format=json&q=" + fromAddress,
+            success: function (response) {
+                console.log(response[0].lat)
+                console.log(response[0].lon)
+
+            },
+            dataType: 'json'
+        });
+
+        var fromAddress = document.getElementById("from-point").value;
+        var toAddress = document.getElementById("to-point").value;
+
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "http://nominatim.openstreetmap.org/search?format=json&q=" + toAddress,
+            success: function (response) {
+                console.log(response[0].lat)
+                console.log(response[0].lon)
+
+            },
+            dataType: 'json'
+        });
+    }
+
 
     function onMoveEnd(evt) {
         var map = evt.map;
