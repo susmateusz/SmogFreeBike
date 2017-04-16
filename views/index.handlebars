@@ -55,14 +55,15 @@
             type: "GET",
             contentType: "application/json",
             url: "http://localhost:3000/aqi/stations",
-            data: {'coords' : coords},
+            data: {'coords': coords},
             //data: {'coords' : 'hallo!'},
-            success: function(data) {
+            success: function (data) {
                 var ul_stations = document.getElementById('stations');
                 while (ul_stations.firstChild) {
                     ul_stations.removeChild(ul_stations.firstChild);
                 }
                 for (var i = 0; i < data["stations"].length; i++) {
+                    // TODO: tutaj dodać markery na mapie dla stacji
                     var item = document.createElement('li');
                     var station = JSON.stringify(data["stations"][i]);
                     item.appendChild(document.createTextNode(station));
