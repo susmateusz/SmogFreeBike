@@ -36,37 +36,32 @@
         return value - (worlds * 360);
     }
 
+    function getLocForAddress(address){
+        return $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            url: "http://nominatim.openstreetmap.org/search?format=json&q=" + address,
+            dataType: 'json'
+        })
+    }
 
 
     function getSearchingCoordinates() {
         var fromAddress = document.getElementById("from-point").value;
         var toAddress = document.getElementById("to-point").value;
 
-        $.ajax({
-            type: "GET",
-            contentType: "application/json",
-            url: "http://nominatim.openstreetmap.org/search?format=json&q=" + fromAddress,
-            success: function (response) {
-                console.log(response[0].lat)
-                console.log(response[0].lon)
-
-            },
-            dataType: 'json'
-        });
-
-        var fromAddress = document.getElementById("from-point").value;
-        var toAddress = document.getElementById("to-point").value;
-
-        $.ajax({
-            type: "GET",
-            contentType: "application/json",
-            url: "http://nominatim.openstreetmap.org/search?format=json&q=" + toAddress,
-            success: function (response) {
-                console.log(response[0].lat)
-                console.log(response[0].lon)
-
-            },
-            dataType: 'json'
+        if(!fromAddress || !toAddress){
+            return 1;
+        }
+        $.when(getLocForAddress(fromAddress),getLocForAddress(toAddress))
+                .then(function(resp1, resp2){
+                    console.log(resp1[0][0].lon);
+                    console.log(resp1[0][0].lat);
+                    console.log(resp2[0][0].lon);
+                    console.log(resp2[0][0].lat);
         });
     }
 
