@@ -1,10 +1,12 @@
 <h1>BajkDojadę</h1>
 <p></p>
-
+<button onclick="addInteraction()">
+    ACTION
+</button>
 <label>From:</label><input type="text" id="from-point">
 <label>To:</label><input type="text" id="to-point">
 <button id="find-button" onclick="getSearchingCoordinates()">Find</button>
-<div id="map" class="map"></div>
+<div id="map-my" class="map"></div>
 <label>top</label><input type="text" id="top">
 <label>right</label><input type="text" id="right"><br>
 <label>bottom</label><input type="text" id="bottom">
@@ -12,20 +14,137 @@
 <div>
     <ul id="stations"></ul>
 </div>
+
+<form class="form-inline">
+    <label>Geometry type &nbsp;</label>
+    <select id="type">
+        <option value="Point">Point</option>
+        <option value="LineString">LineString</option>
+        <option value="Polygon">Polygon</option>
+        <option value="Circle">Circle</option>
+    </select>
+</form>
+
+
+<div id="map"></div>
+<div id="inputForm">Latitude:
+    <input id="latitude" type="text" value="51.481383"/>
+    Longitude:
+    <input id="longitude" type="text" value="-0.087891"/>
+    <input id="bbb" type="button" value="Add Marker" onclick="addInteraction()" />
+</div>
 <script type="text/javascript">
-    var map = new ol.Map({
-        target: 'map',
-        layers: [
-            new ol.layer.Tile({
-                source: new ol.source.OSM()
-            })
-        ],
-        view: new ol.View({
-            //projection: 'EPSG:4326',
-            center: ol.proj.fromLonLat([17, 51]),
-            zoom: 10
-        })
+
+    var raster = new ol.layer.Tile({
+        source: new ol.source.OSM()
     });
+
+    var iconFeatures=[];
+
+    var iconFeature = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.transform([-72.0704, 46.678], 'EPSG:4326',
+                'EPSG:3857')),
+        name: 'Null Island',
+        population: 4000,
+        rainfall: 500
+    });
+
+    iconFeatures.push(iconFeature);
+
+    var vectorSource = new ol.source.Vector({
+        features: iconFeatures //add an array of features
+    });
+
+    var iconStyle = new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0.2)'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#ffcc33',
+                width: 2
+            }),
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({
+                    color: '#ffcc33'
+                })
+            })
+    });
+
+
+    var vectorLayer = new ol.layer.Vector({
+        source: vectorSource,
+        style: iconStyle
+    });
+
+    /////////////////////***************?????////////////////////
+
+//    var map = new ol.Map({
+//        layers: [raster],
+//        target: 'map-my',
+//        view: new ol.View({
+//            //projection: 'EPSG:4326',
+//            center: ol.proj.fromLonLat([17, 51]),
+//            zoom: 10
+//        })
+//    });
+//
+//    var features = new ol.Collection();
+//    var featureOverlay = new ol.layer.Vector({
+//        source: new ol.source.Vector({features: features}),
+//        style: new ol.style.Style({
+//            fill: new ol.style.Fill({
+//                color: 'rgba(255, 255, 255, 0.2)'
+//            }),
+//            stroke: new ol.style.Stroke({
+//                color: '#ffcc33',
+//                width: 2
+//            }),
+//            image: new ol.style.Circle({
+//                radius: 7,
+//                fill: new ol.style.Fill({
+//                    color: '#ffcc33'
+//                })
+//            })
+//        })
+//    });
+//    featureOverlay.setMap(map);
+//
+//    var modify = new ol.interaction.Modify({
+//        features: features,
+//        // the SHIFT key must be pressed to delete vertices, so
+//        // that new vertices can be drawn at the same position
+//        // of existing vertices
+//        deleteCondition: function(event) {
+//            return ol.events.condition.shiftKeyOnly(event) &&
+//                    ol.events.condition.singleClick(event);
+//        }
+//    });
+//    map.addInteraction(modify);
+//
+//    var draw; // global so we can remove it later
+//    var typeSelect = document.getElementById('type');
+//
+//    function addInteraction() {
+//        draw = new ol.interaction.Draw({
+//            features: features,
+//            type: /** @type {ol.geom.GeometryType} */ (typeSelect.value)
+//        });
+//        map.addInteraction(draw);
+//    }
+//
+//
+//    /**
+//     * Handle change event.
+//     */
+//    typeSelect.onchange = function() {
+//        map.removeInteraction(draw);
+//        addInteraction();
+//    };
+//
+//    addInteraction();
+
+    ////*******************???????????
 
     function display(id, value) {
         document.getElementById(id).value = value.toFixed(2);
@@ -48,10 +167,12 @@
         })
     }
 
+    var fromAddress;
+    var toAddress;
 
     function getSearchingCoordinates() {
-        var fromAddress = document.getElementById("from-point").value;
-        var toAddress = document.getElementById("to-point").value;
+        fromAddress = document.getElementById("from-point").value;
+        toAddress = document.getElementById("to-point").value;
 
         if(!fromAddress || !toAddress){
             return 1;
@@ -62,6 +183,10 @@
                     console.log(resp1[0][0].lat);
                     console.log(resp2[0][0].lon);
                     console.log(resp2[0][0].lat);
+                    addInteraction(resp1[0][0].lon,
+                            resp1[0][0].lat,
+                            resp2[0][0].lon,
+                            resp2[0][0].lat)
                     // TODO: Zmienić zakres mapy tak, by widoczne były obie lokalizacje.
         });
     }
@@ -108,7 +233,43 @@
         });
     }
 
+    var map = new ol.Map({
+        target: 'map-my',
+        layers: [
+            new ol.layer.Tile({
+                source: new ol.source.OSM()
+            }),
+            vectorLayer
+        ],
+        view: new ol.View({
+            //projection: 'EPSG:4326',
+            center: ol.proj.fromLonLat([17, 51]),
+            zoom: 0
+        })
+    });
+
     map.on('moveend',onMoveEnd);
 
+    function addInteraction(x1, y1, x2, y2) {
+        console.log("Akcja!!!" + x1 + " " +y1 )
+        var ico1 = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([y1, x1])),
+                    //ol.proj.transform([y1, x1], 'EPSG:4326','EPSG:3857')),
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500
+        });
+
+        var ico2 = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([y2, x2])),
+            //ol.proj.transform([y1, x1], 'EPSG:4326','EPSG:3857')),
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500
+        });
+        vectorSource.addFeature(ico1);
+        vectorSource.addFeature(ico2);
+
+    }
 
 </script>
