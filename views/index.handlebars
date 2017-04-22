@@ -13,6 +13,11 @@
     <ul id="stations"></ul>
 </div>
 <script type="text/javascript">
+    var view = new ol.View({
+        //projection: 'EPSG:4326',
+        center: ol.proj.fromLonLat([17, 51]),
+        zoom: 10
+    });
     var map = new ol.Map({
         target: 'map',
         layers: [
@@ -20,11 +25,7 @@
                 source: new ol.source.OSM()
             })
         ],
-        view: new ol.View({
-            //projection: 'EPSG:4326',
-            center: ol.proj.fromLonLat([17, 51]),
-            zoom: 10
-        })
+        view: view
     });
 
     function display(id, value) {
@@ -57,12 +58,32 @@
             return 1;
         }
         $.when(getLocForAddress(fromAddress),getLocForAddress(toAddress))
-                .then(function(resp1, resp2){
-                    console.log(resp1[0][0].lon);
-                    console.log(resp1[0][0].lat);
-                    console.log(resp2[0][0].lon);
-                    console.log(resp2[0][0].lat);
+                .then(function(resp1, resp2) {
+                    var min_lon = parseFloat(Math.min(resp1[0][0].lon, resp2[0][0].lon));
+                    var max_lon = parseFloat(Math.max(resp1[0][0].lon, resp2[0][0].lon));
+                    var min_lat = parseFloat(Math.min(resp1[0][0].lat, resp2[0][0].lat));
+                    var max_lat = parseFloat(Math.max(resp1[0][0].lat, resp2[0][0].lat));
+
+                    var coords = [resp1[0][0].lon, resp1[0][0].lat, resp2[0][0].lon, resp2[0][0].lat];
+                    console.log(coords);
+                    var min_xy = ol.proj.fromLonLat([min_lon, min_lat]);
+                    var max_xy = ol.proj.fromLonLat([max_lon, max_lat]);
+                    view.fit(min_xy.concat(max_xy), {
+                        duration: 2000,
+                        padding: [15, 15, 15, 15]
+                    });
                     // TODO: Zmienić zakres mapy tak, by widoczne były obie lokalizacje.
+                    $.ajax({
+                        type: "GET",
+                        contentType: "application/json",
+                        url: "http://localhost:3000/mapquest",
+                        data: {'coords': coords},
+                        //data: {'coords' : 'hallo!'},
+                        success: function (data) {
+                            console.log("Wysłano start i koniec.");
+                        },
+                        dataType: 'json'
+                    });
         });
     }
 

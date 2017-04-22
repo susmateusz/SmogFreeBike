@@ -8,6 +8,7 @@ var exphbs = require('express-handlebars');
 
 var index = require('./routes/index');
 var aqi = require('./routes/aqi');
+var mapquest = require('./routes/mapquest');
 var users = require('./routes/users');
 
 var app = express();
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/aqi',aqi);
+app.use('/mapquest',mapquest);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
