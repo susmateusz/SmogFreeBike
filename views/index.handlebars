@@ -6,7 +6,7 @@
 <label>From:</label><input type="text" id="from-point">
 <label>To:</label><input type="text" id="to-point">
 <button id="find-button" onclick="getSearchingCoordinates()">Find</button>
-<div id="map-my" class="map"></div>
+<div id="map"></div>
 <label>top</label><input type="text" id="top">
 <label>right</label><input type="text" id="right"><br>
 <label>bottom</label><input type="text" id="bottom">
@@ -25,8 +25,6 @@
     </select>
 </form>
 
-
-<div id="map"></div>
 <div id="inputForm">Latitude:
     <input id="latitude" type="text" value="51.481383"/>
     Longitude:
@@ -60,18 +58,21 @@
     });
 
     var iconStyle = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(255, 255, 255, 0.2)'
+        }),
+        stroke: new ol.style.Stroke({
+            color: '#ffcc33',
+            width: 2
+        }),
+        image: new ol.style.Circle({
+            radius: 7,
             fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 255, 0.2)'
-            }),
-            stroke: new ol.style.Stroke({
-                color: '#ffcc33',
-                width: 2
-            }),
-            image: new ol.style.Circle({
-                radius: 7,
-                fill: new ol.style.Fill({
-                    color: '#ffcc33'
-                })
+                color: '#ffcc33'
+            })
+        })
+    });
+
     var map = new ol.Map({
         target: 'map',
         layers: [
@@ -263,21 +264,6 @@
             dataType: 'json'
         });
     }
-
-    var map = new ol.Map({
-        target: 'map-my',
-        layers: [
-            new ol.layer.Tile({
-                source: new ol.source.OSM()
-            }),
-            vectorLayer
-        ],
-        view: new ol.View({
-            //projection: 'EPSG:4326',
-            center: ol.proj.fromLonLat([17, 51]),
-            zoom: 0
-        })
-    });
 
     map.on('moveend',onMoveEnd);
 
