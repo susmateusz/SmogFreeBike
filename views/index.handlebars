@@ -21,22 +21,24 @@
     });
 
     var iconFeatures=[];
+    var stationFeatures=[];
 
-    var iconFeature = new ol.Feature({
-        geometry: new ol.geom.Point(ol.proj.transform([-72.0704, 46.678], 'EPSG:4326',
-                'EPSG:3857')),
-        name: 'Null Island',
-        population: 4000,
-        rainfall: 500
-    });
+//    var iconFeature = new ol.Feature({
+//        geometry: new ol.geom.Point(ol.proj.transform([-72.0704, 46.678], 'EPSG:4326',
+//                'EPSG:3857'))
+//    });
+//
+//    iconFeatures.push(iconFeature);
 
-    iconFeatures.push(iconFeature);
-
-    var vectorSource = new ol.source.Vector({
+    var locationSource = new ol.source.Vector({
         features: iconFeatures //add an array of features
     });
 
-    var iconStyle = new ol.style.Style({
+    var stationsSource = new ol.source.Vector({
+        features: stationFeatures //add an array of features
+    });
+
+    var locationStyle = new ol.style.Style({
         fill: new ol.style.Fill({
             color: 'rgba(255, 255, 255, 0.2)'
         }),
@@ -52,10 +54,31 @@
         })
     });
 
+    var stationStyle = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(100, 100, 50, 0.9)'
+        }),
+        stroke: new ol.style.Stroke({
+            color: 'rgba(100, 100, 50, 0.9)',
+            width: 2
+        }),
+        image: new ol.style.Circle({
+            radius: 7,
+            fill: new ol.style.Fill({
+                color: 'rgba(100, 100, 50, 0.9)'
+            })
+        })
+    });
 
-    var vectorLayer = new ol.layer.Vector({
-        source: vectorSource,
-        style: iconStyle
+
+    var locationLayer = new ol.layer.Vector({
+        source: locationSource,
+        style: locationStyle
+    });
+
+    var stationsLayer = new ol.layer.Vector({
+        source: stationsSource,
+        style: stationStyle
     });
 
     function display(id, value) {
@@ -123,7 +146,6 @@
         });
     }
 
-
     function onMoveEnd(evt) {
         var map = evt.map;
         var extent = map.getView().calculateExtent(map.getSize());
@@ -160,35 +182,66 @@
                     item.appendChild(document.createTextNode(station));
                     ul_stations.appendChild(item);
                 }
+                drawStations(data);
             },
             dataType: 'json'
         });
     }
 
 
+    function drawStations(stationsData){
+
+        stationsSource.clear();
+
+        for (var i = 0; i < stationsData["stations"].length; i++) {
+            // TODO: tutaj dodać markery na mapie dla stacji
+
+            var lonStation = stationsData["stations"][i]["lon"]
+            var latStation = stationsData["stations"][i]["lat"]
+
+
+            var ico1 = new ol.Feature({
+                //ol.proj.fromLonLat([min_lon, min_lat]);
+                geometry:
+                        //new ol.geom.Circle({center: [+lonStation, +latStation], radius: 30})
+                        new ol.geom.Point(ol.proj.transform([+lonStation, +latStation], 'EPSG:4326','EPSG:3857'))
+                //new ol.geom.Point(ol.proj.fromLonLat([lat1, lon1])),
+                //ol.proj.transform([y1, x1], 'EPSG:4326','EPSG:3857')),
+            });
+
+            stationsSource.addFeature(ico1);
+
+
+//
+//            var item = document.createElement('li');
+//            var station = JSON.stringify();
+//            item.appendChild(document.createTextNode(station));
+//            ul_stations.appendChild(item);
+        }
+
+
+
+
+
+    }
 
     function drawStartAndFinish(lon1, lat1, lon2, lat2) {
-        console.log("Akcja!!!" + lon1 + " " +lat1 )
+        //console.log("Akcja!!!" + lon1 + " " +lat1 )
         var ico1 = new ol.Feature({
             //ol.proj.fromLonLat([min_lon, min_lat]);
             geometry:
-                    new ol.geom.Point(ol.proj.transform([+lon1, +lat1], 'EPSG:4326','EPSG:3857')),
+                    new ol.geom.Point(ol.proj.transform([+lon1, +lat1], 'EPSG:4326','EPSG:3857'))
                     //new ol.geom.Point(ol.proj.fromLonLat([lat1, lon1])),
                     //ol.proj.transform([y1, x1], 'EPSG:4326','EPSG:3857')),
-            name: 'Null Island',
-            population: 4000,
-            rainfall: 500
         });
 
         var ico2 = new ol.Feature({
-            geometry: new ol.geom.Point(ol.proj.fromLonLat([+lon2, +lat2])),
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([+lon2, +lat2]))
             //ol.proj.transform([y1, x1], 'EPSG:4326','EPSG:3857')),
-            name: 'Null Island',
-            population: 4000,
-            rainfall: 500
         });
-        vectorSource.addFeature(ico1);
-        vectorSource.addFeature(ico2);
+        locationSource.clear();
+        locationSource.addFeature(ico1);
+        locationSource.addFeature(ico2);
 
     }
 
@@ -198,7 +251,8 @@
             new ol.layer.Tile({
                 source: new ol.source.OSM()
             }),
-            vectorLayer
+            locationLayer
+            ,stationsLayer
 
         ]
         , view: view
