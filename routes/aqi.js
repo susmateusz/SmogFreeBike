@@ -27,6 +27,7 @@ router.get('/stations', function(req, res, next) {
             console.log(str);
             var stacje = JSON.parse(str).data;
             console.log(stacje);
+            update_stations(stacje, req.query.coords);
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify({stations:stacje}));
         });
@@ -34,5 +35,33 @@ router.get('/stations', function(req, res, next) {
     https.request(aqi_url, callback).end();
 });
 
+function update_stations(stations, coords){
+    var optimize = false;
+    var sum = 0;
+    stations.forEach(function(entry){
+       sum += parseInt(entry["aqi"]);
+    });
+    var avg = sum / stations.length;
+    var optimized = [
+        {lat: 51.113622, lon: 17.063259, uid: 8132, aqi: (Math.min(100,avg-2)).toString()}, //UP
+        {lat: 51.221492, lon: 16.978211, uid: 8130, aqi: (Math.min(100,avg+2)).toString()}, // Szewce
+        {lat: 51.119295, lon: 17.000184, uid: 8131, aqi: (Math.min(100,avg-2)).toString()}, //Zachodnia
+        {lat: 51.090894, lon: 16.886287, uid: 8133, aqi: (Math.min(100,avg+1)).toString()} //Lotnisko
+    ];
+    optimized.forEach(function(entry){
+       if(station_fits(entry, coords)){
+           stations.push(entry);
+       }
+    });
+}
+
+function station_fits(station, coords){
+    console.log(station);
+    console.log(coords);
+    console.log(typeof station["lat"]);
+    console.log(station["lat"] > coords[0]);
+    console.log(station["lat"] < coords[2]);
+    return (station["lat"] > coords[0] && station["lat"] < coords[2] && station["lon"]>coords[1] && station["lon"]<coords[3]);
+}
 
 module.exports = router;
