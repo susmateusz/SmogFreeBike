@@ -22,6 +22,7 @@
 
     var iconFeatures=[];
     var stationFeatures=[];
+    var routeFeatures = [];
 
 //    var iconFeature = new ol.Feature({
 //        geometry: new ol.geom.Point(ol.proj.transform([-72.0704, 46.678], 'EPSG:4326',
@@ -30,12 +31,17 @@
 //
 //    iconFeatures.push(iconFeature);
 
+
     var locationSource = new ol.source.Vector({
         features: iconFeatures //add an array of features
     });
 
     var stationsSource = new ol.source.Vector({
         features: stationFeatures //add an array of features
+    });
+
+    var routesSource = new ol.source.Vector({
+        features: routeFeatures
     });
 
     var locationStyle = new ol.style.Style({
@@ -70,6 +76,13 @@
         })
     });
 
+    var routesStyle = new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            width: 6,
+            color: [140, 40, 40, 0.8]
+        })
+    });
+
 
     var locationLayer = new ol.layer.Vector({
         source: locationSource,
@@ -79,6 +92,11 @@
     var stationsLayer = new ol.layer.Vector({
         source: stationsSource,
         style: stationStyle
+    });
+
+    var routesLayer = new ol.layer.Vector({
+        source: routesSource,
+        style: routesStyle
     });
 
     function display(id, value) {
@@ -124,6 +142,11 @@
                             resp1[0][0].lat,
                             resp2[0][0].lon,
                             resp2[0][0].lat);
+                    drawRoutes(resp1[0][0].lon,
+                            resp1[0][0].lat,
+                            resp2[0][0].lon,
+                            resp2[0][0].lat);
+
                     console.log(coords);
                     var min_xy = ol.proj.fromLonLat([min_lon, min_lat]);
                     var max_xy = ol.proj.fromLonLat([max_lon, max_lat]);
@@ -135,11 +158,13 @@
                     $.ajax({
                         type: "GET",
                         contentType: "application/json",
-                        url: "http://localhost:3000/mapquest",
+                        url: "http://localhost:3000/mapquest/routes",
                         data: {'coords': coords},
                         //data: {'coords' : 'hallo!'},
                         success: function (data) {
                             console.log("Wysłano start i koniec.");
+                            console.log(data);
+                            drawRoute(data.route);
                         },
                         dataType: 'json'
                     });
@@ -245,6 +270,25 @@
 
     }
 
+    function drawRoute(shapePoints) {
+        routesSource.clear();
+        for(i = 0; i + 3 < shapePoints.length;i+=2){
+            drawRoutes(shapePoints[i],
+                    shapePoints[i+1],
+                    shapePoints[i+2],
+                    shapePoints[i+3]
+            );
+        }
+    }
+    function drawRoutes(lat1, lon1, lat2, lon2){
+        var start = ol.proj.transform([+lon1, +lat1], 'EPSG:4326','EPSG:3857');
+        var end = ol.proj.transform([+lon2, +lat2], 'EPSG:4326','EPSG:3857');
+        var icon = new ol.Feature({
+           geometry: new ol.geom.LineString([start,end])
+        });
+        routesSource.addFeature(icon);
+    }
+
     var map = new ol.Map({
         target: 'map',
         layers: [
@@ -253,7 +297,7 @@
             }),
             locationLayer
             ,stationsLayer
-
+            ,routesLayer
         ]
         , view: view
     });
