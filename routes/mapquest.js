@@ -17,6 +17,13 @@ router.get('/routes', function(req, res, next) {
         + "&to=" + coords[3] + "," + coords[2]
     ;
 
+    var coords_parsed = [];
+    coords.forEach(function(entry){
+       coords_parsed.push(parseInt(entry));
+    });
+    var center = [(coords[0]+coords[2])/2,(coords[1]+coords[3])/2];
+    console.log("CENTER: " + center);
+
     var callback = function(response) {
         var str = '';
         //another chunk of data has been recieved, so append it to `str`

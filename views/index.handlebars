@@ -20,9 +20,11 @@
         source: new ol.source.OSM()
     });
 
+    var stationsList2 = []; // stacje potrzebne do wyliczania wspolczynnika jakosci trasy
     var iconFeatures=[];
     var stationFeatures=[];
     var routeFeatures = [];
+    var labelFeatures = [];
 
 //    var iconFeature = new ol.Feature({
 //        geometry: new ol.geom.Point(ol.proj.transform([-72.0704, 46.678], 'EPSG:4326',
@@ -42,6 +44,10 @@
 
     var routesSource = new ol.source.Vector({
         features: routeFeatures
+    });
+
+    var labelsSource = new ol.source.Vector({
+        features: labelFeatures
     });
 
     var locationStyle = new ol.style.Style({
@@ -82,6 +88,7 @@
             color: [140, 40, 40, 0.8]
         })
     });
+    
 
 
     var locationLayer = new ol.layer.Vector({
@@ -138,6 +145,12 @@
                     var max_lat = parseFloat(Math.max(resp1[0][0].lat, resp2[0][0].lat));
 
                     var coords = [resp1[0][0].lon, resp1[0][0].lat, resp2[0][0].lon, resp2[0][0].lat];
+                    var style = new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            width: 6,
+                            color: [40, 140, 40, 0.8]
+                        })
+                    });
                     drawStartAndFinish(resp1[0][0].lon,
                             resp1[0][0].lat,
                             resp2[0][0].lon,
@@ -145,7 +158,9 @@
                     drawRoutes(resp1[0][0].lon,
                             resp1[0][0].lat,
                             resp2[0][0].lon,
-                            resp2[0][0].lat);
+                            resp2[0][0].lat,
+                            style
+                    );
 
                     console.log(coords);
                     var min_xy = ol.proj.fromLonLat([min_lon, min_lat]);
@@ -154,6 +169,9 @@
                         duration: 500,
                         padding: [15, 15, 15, 15]
                     });
+                    routesSource.clear();
+                    console.log("COUNT STATIONS: ");
+                    console.log(stationsList2);
                     // TODO: Zmienić zakres mapy tak, by widoczne były obie lokalizacje.
                     $.ajax({
                         type: "GET",
@@ -164,10 +182,88 @@
                         success: function (data) {
                             console.log("Wysłano start i koniec.");
                             console.log(data);
-                            drawRoute(data.route);
+                            // rysowanie 1. trasy
+                            var style = new ol.style.Style({
+                                stroke: new ol.style.Stroke({
+                                    width: 6,
+                                    color: [40, 140, 40, 0.8]
+                                })
+                            });
+                            console.log("hello" + stationsList2.length);
+                            var grade = rateRoute(data.route, stationsList2);
+                            var routeStyle = selectStyle(grade);
+                            drawRoute(data.route, routeStyle);
+                            var middle_lat = data.route[data.route.length/2];
+                            var middle_lon = data.route[data.route.length/2 + 1];
+                            drawLabel(middle_lat, middle_lon, grade);
                         },
                         dataType: 'json'
                     });
+        });
+    }
+
+    function selectStyle(grade) {
+        var color = [];
+        if(grade < 20) {
+            color = [90, 0, 0, 0.8];
+        }
+        if(grade >= 20 && grade < 40) {
+            color = [200, 0, 0, 0.8];
+        }
+        if(grade >= 40 && grade < 60) {
+            color = [200, 200, 0, 0.8];
+        }
+        if(grade >= 60 && grade < 80) {
+            color = [100, 200, 0, 0.8];
+        }
+        if( grade >= 80) {
+            color = [0, 250, 0, 0.8];
+        }
+        console.log("color: " + color);
+        return new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                width: 6,
+                color: color
+            })
+        });
+
+    }
+
+    function rateRoute(routes, stations) {
+        var distances = new Array(stations.length);
+        for(s = 0; s < stations.length;s++){
+            distances[s] = 100000;
+            var nearest_p_idx = 0;
+            for(p = 0;p < routes.length - 1; p+=2){
+                var lat = routes[p];
+                var lon = routes[p+1];
+                var stat = stations[s];
+                var dist = Math.sqrt(Math.pow(stat["lat"]-lat,2)+Math.pow(stat["lon"]-lon,2));
+                if(dist < distances[s]){
+                    distances[s] = dist;
+                    nearest_p_idx = p;
+                }
+            }
+        }
+        sum = 0.0;
+        sumWeights = 0.0;
+        for(s = 0; s < stations.length;s++){
+            if(!isNaN(parseInt(stations[s]["aqi"]))) {
+                sum += parseInt(stations[s]["aqi"]) * distances[s];
+                sumWeights += distances[s];
+            }
+        }
+        return sum / sumWeights;
+    }
+
+    function drawLabel(middle_lat, middle_lon, grade){
+        var iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.transform([0.0488567 - 0.003, -0.02275 + 0.00115 ], 'EPSG:4326', 'EPSG:3857')),
+            label:"adsfasdf",
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500,
+
         });
     }
 
@@ -207,7 +303,11 @@
                     item.appendChild(document.createTextNode(station));
                     ul_stations.appendChild(item);
                 }
+                console.log("Settings stations: ");
+                console.log(data);
+                stationsList2 = data["stations"];
                 drawStations(data);
+
             },
             dataType: 'json'
         });
@@ -221,8 +321,8 @@
         for (var i = 0; i < stationsData["stations"].length; i++) {
             // TODO: tutaj dodać markery na mapie dla stacji
 
-            var lonStation = stationsData["stations"][i]["lon"]
-            var latStation = stationsData["stations"][i]["lat"]
+            var lonStation = stationsData["stations"][i]["lon"];
+            var latStation = stationsData["stations"][i]["lat"];
 
 
             var ico1 = new ol.Feature({
@@ -270,22 +370,23 @@
 
     }
 
-    function drawRoute(shapePoints) {
-        routesSource.clear();
+    function drawRoute(shapePoints, style) {
         for(i = 0; i + 3 < shapePoints.length;i+=2){
             drawRoutes(shapePoints[i],
                     shapePoints[i+1],
                     shapePoints[i+2],
-                    shapePoints[i+3]
+                    shapePoints[i+3],
+                    style
             );
         }
     }
-    function drawRoutes(lat1, lon1, lat2, lon2){
+    function drawRoutes(lat1, lon1, lat2, lon2, style){
         var start = ol.proj.transform([+lon1, +lat1], 'EPSG:4326','EPSG:3857');
         var end = ol.proj.transform([+lon2, +lat2], 'EPSG:4326','EPSG:3857');
         var icon = new ol.Feature({
-           geometry: new ol.geom.LineString([start,end])
+           geometry: new ol.geom.LineString([start,end]),
         });
+        icon.setStyle(style);
         routesSource.addFeature(icon);
     }
 
