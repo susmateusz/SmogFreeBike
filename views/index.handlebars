@@ -1,7 +1,9 @@
-<h1>BajkDojadę</h1>
+<h1>SmogFree Bike</h1>
 <label>From:</label><input type="text" id="from-point" value="Wrocław">
 <label>To:</label><input type="text" id="to-point" value="Radom">
-<button id="find-button" onclick="getSearchingCoordinates()">Find</button>
+<label>Max AQI:</label><input type="number" id="max-aqi" value=80>
+<button id="find-button" onclick="getSearchingCoordinates()">Find</button><br>
+<label id="warningLabel"></label>
 <div id="map"></div>
 <label>top</label><input type="text" id="top">
 <label>right</label><input type="text" id="right"><br>
@@ -19,6 +21,8 @@
         source: new ol.source.OSM()
     });
 
+    var warningText = "Uwaga, AQI powyżej 150 jest niebezpieczne dla zdrowia!"
+    var aqi = 80;
     var stationsList2 = []; // stacje potrzebne do wyliczania wspolczynnika jakosci trasy
     var iconFeatures=[];
     var stationFeatures=[];
@@ -102,6 +106,19 @@
         })
     });
 
+    var lethalSmogStyle = new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: 'rgba(128, 0, 0, 0.5)'
+        }),
+        stroke: new ol.style.Stroke({
+            color: 'rgba(0, 0, 0, 0.7)',
+            width: 2,
+            lineCap: 'square',
+            lineDash: [7,4,7],
+            lineDashOffset: 10
+        })
+    });
+
     var routesStyle = new ol.style.Style({
         stroke: new ol.style.Stroke({
             width: 6,
@@ -112,9 +129,13 @@
 
     function smogStyleFunction(feature, resolution){
         var rank = feature.get('rank')
-        if(+rank < 55){
+        if(+rank < 50){
             return [lowSmogStyle];
-        } else if(+rank > 60) {
+        } 
+        if(+rank > 200) {
+            return [lethalSmogStyle];
+        }
+        if(+rank > aqi) {
             return [dangerousSmogStyle];
         }
         return [mediumSmogStyle];
@@ -166,6 +187,13 @@
     function getSearchingCoordinates() {
         fromAddress = document.getElementById("from-point").value;
         toAddress = document.getElementById("to-point").value;
+        aqi = document.getElementById("max-aqi").value;
+        wLabel = document.getElementById('warningLabel');
+        if(aqi > 150){
+            wLabel.innerHTML = warningText;
+        } else {
+            wLabel.innerHTML = '';
+        }
 
         if(!fromAddress || !toAddress){
             return 1;
@@ -364,7 +392,7 @@
                     stationcr
             });
 
-            var sm = new ol.geom.Circle(ol.proj.transform([+lonStation, +latStation], 'EPSG:4326','EPSG:3857'), 3000)
+            var sm = new ol.geom.Circle(ol.proj.transform([+lonStation, +latStation], 'EPSG:4326','EPSG:3857'), 2500)
             var smogcr = ol.geom.Polygon.fromCircle(sm);
             var smog = new ol.Feature({
                 geometry:

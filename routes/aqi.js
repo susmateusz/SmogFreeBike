@@ -70,11 +70,17 @@ function update_stations(stations, coords){
     });
     var avg = sum / stations.length;
     var optimized = [
-        {lat: 51.113622, lon: 17.063259, uid: 8132, aqi: (Math.min(100,avg-2)).toString()}, //UP
-        {lat: 51.221492, lon: 16.978211, uid: 8130, aqi: (Math.min(100,avg+2)).toString()}, // Szewce
-        {lat: 51.119295, lon: 17.000184, uid: 8131, aqi: (Math.min(100,avg-2)).toString()}, //Zachodnia
-        {lat: 51.090894, lon: 16.886287, uid: 8133, aqi: (Math.min(100,avg+1)).toString()}, //Lotnisko
-        {lat: 51.113717, lon: 17.034162, uid: 8134, aqi: (Math.min(100,avg-3)).toString()} //Uniwersystet
+         {lat: 51.113622, lon: 17.063259, uid: 8132, aqi: 58}, //UP
+         {lat: 51.18, lon: 16.93, uid: 9999, aqi: 666}, //SMIETRELNE
+         //{lat: 51.113622, lon: 17.063259, uid: 8132, aqi: (Math.min(100,avg-2)).toString()}, //UP
+         {lat: 51.221492, lon: 16.978211, uid: 8130, aqi: 46}, // Szewce
+         //{lat: 51.221492, lon: 16.978211, uid: 8130, aqi: (Math.min(100,avg+2)).toString()}, // Szewce
+         {lat: 51.119295, lon: 17.000184, uid: 8131, aqi: 59}, //Zachodnia
+         //{lat: 51.119295, lon: 17.000184, uid: 8131, aqi: (Math.min(100,avg-2)).toString()}, //Zachodnia
+         {lat: 51.090894, lon: 16.886287, uid: 8133, aqi: 45}, //Lotnisko
+         //{lat: 51.090894, lon: 16.886287, uid: 8133, aqi: (Math.min(100,avg+1)).toString()}, //Lotnisko
+         {lat: 51.113717, lon: 17.034162, uid: 8134, aqi: 65} //Uniwersystet
+         //{lat: 51.113717, lon: 17.034162, uid: 8134, aqi: (Math.min(100,avg-3)).toString()} //Uniwersystet
 
     ];
     optimized.forEach(function(entry){
