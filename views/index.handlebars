@@ -1,6 +1,6 @@
 <h1>SmogFree Bike</h1>
-<label>From:</label><input type="text" id="from-point" value="Wrocław">
-<label>To:</label><input type="text" id="to-point" value="Radom">
+<label>From:</label><input type="text" id="from-point" value="Marino, Wrocław">
+<label>To:</label><input type="text" id="to-point" value="Plac Grunwaldzki, Wrocław">
 <label>Max AQI:</label><input type="number" id="max-aqi" value=80>
 <button id="find-button" onclick="getSearchingCoordinates()">Find</button><br>
 <label id="warningLabel"></label>
@@ -128,7 +128,7 @@
     
 
     function smogStyleFunction(feature, resolution){
-        var rank = feature.get('rank')
+        var rank = feature.get('rank');
         if(+rank < 50){
             return [lowSmogStyle];
         } 
@@ -250,6 +250,7 @@
                             });
                             console.log("hello" + stationsList2.length);
                             var grade = rateRoute(data.route, stationsList2);
+                            console.log("Grade: "+ grade);
                             var routeStyle = selectStyle(grade);
                             drawRoute(data.route, routeStyle);
                             var middle_lat = data.route[data.route.length/2];
@@ -262,21 +263,21 @@
     }
 
     function selectStyle(grade) {
-        var color = [];
-        if(grade < 20) {
-            color = [90, 0, 0, 0.8];
+        var color = "";
+        if(grade >= 201) {
+            color = '#FF0000';
         }
-        if(grade >= 20 && grade < 40) {
-            color = [200, 0, 0, 0.8];
+        if(grade >= 151 && grade < 200) {
+            color = '#FF7F00';
         }
-        if(grade >= 40 && grade < 60) {
-            color = [200, 200, 0, 0.8];
+        if(grade >= 101 && grade < 150) {
+            color = '#FFFF00';
         }
-        if(grade >= 60 && grade < 80) {
-            color = [100, 200, 0, 0.8];
+        if(grade >= 51 && grade < 100) {
+            color = '#77AA00';
         }
-        if( grade >= 80) {
-            color = [0, 250, 0, 0.8];
+        if( grade <= 50) {
+            color = '#00FF00';
         }
         console.log("color: " + color);
         return new ol.style.Style({
@@ -297,7 +298,7 @@
                 var lat = routes[p];
                 var lon = routes[p+1];
                 var stat = stations[s];
-                var dist = Math.sqrt(Math.pow(stat["lat"]-lat,2)+Math.pow(stat["lon"]-lon,2));
+                var dist = 1/Math.pow(Math.sqrt(Math.pow(stat["lat"]-lat,2)+Math.pow(stat["lon"]-lon,2)),2);
                 if(dist < distances[s]){
                     distances[s] = dist;
                     nearest_p_idx = p;
@@ -308,6 +309,7 @@
         sumWeights = 0.0;
         for(s = 0; s < stations.length;s++){
             if(!isNaN(parseInt(stations[s]["aqi"]))) {
+                console.log(distances[s] + "\t\t" + stations[s]["aqi"]);
                 sum += parseInt(stations[s]["aqi"]) * distances[s];
                 sumWeights += distances[s];
             }
@@ -383,7 +385,7 @@
 
             var lonStation = stationsData["stations"][i]["lon"];
             var latStation = stationsData["stations"][i]["lat"];
-            var rank = stationsData["stations"][i]["aqi"]
+            var rank = stationsData["stations"][i]["aqi"];
 
             var stat = new ol.geom.Circle(ol.proj.transform([+lonStation, +latStation], 'EPSG:4326','EPSG:3857'), 70)
             var stationcr = ol.geom.Polygon.fromCircle(stat);
@@ -399,6 +401,7 @@
                     smogcr
             });
             smogSource.addFeature(smog);
+            console.log("rank: " + rank);
             smog.set('rank', rank)
             stationsSource.addFeature(station);
         }
