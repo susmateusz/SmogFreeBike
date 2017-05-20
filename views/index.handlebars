@@ -364,7 +364,7 @@
                     stationcr
             });
 
-            var sm = new ol.geom.Circle(ol.proj.transform([+lonStation, +latStation], 'EPSG:4326','EPSG:3857'), 3000)
+            var sm = new ol.geom.Circle(ol.proj.transform([+lonStation, +latStation], 'EPSG:4326','EPSG:3857'), 2500)
             var smogcr = ol.geom.Polygon.fromCircle(sm);
             var smog = new ol.Feature({
                 geometry:
@@ -377,14 +377,14 @@
     }
 
     function drawStartAndFinish(lon1, lat1, lon2, lat2) {
-        var cr1 = new ol.geom.Circle(ol.proj.transform([+lon1, +lat1], 'EPSG:4326','EPSG:3857'), 150)
+        var cr1 = new ol.geom.Circle(ol.proj.transform([+lon1, +lat1], 'EPSG:4326','EPSG:3857'), 100)
         var start = ol.geom.Polygon.fromCircle(cr1);
         var ico1 = new ol.Feature({
             geometry:
                     start
         });
 
-        var cr2 = new ol.geom.Circle(ol.proj.transform([+lon2, +lat2], 'EPSG:4326','EPSG:3857'), 150)
+        var cr2 = new ol.geom.Circle(ol.proj.transform([+lon2, +lat2], 'EPSG:4326','EPSG:3857'), 100)
         var stop = ol.geom.Polygon.fromCircle(cr2);
         var ico2 = new ol.Feature({
             geometry:
