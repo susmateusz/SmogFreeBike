@@ -1,0 +1,24 @@
+Film bêdzie siê sk³ada³ z trzech czeœci.
+
+Rekwizyty:
+* 2 rowery.
+* 2 kaski rowerowe.
+* uchwyt na telefon/kamerkê na rower/kask.
+
+Z klatki wychodzi 2 rowerzystów, przygotowuj¹ siê do jazdy, zak³adaj¹ kaski na których umieszczone s¹ kamerki.
+W momencie za³o¿enia kasku z kamerk¹ widok prze³¹cza siê na 1. rowerzystê.
+W 1/3 filmu kamera prze³¹cza siê na 2. rowerzystê.
+W 2/3 filmu kamera przegl¹da siê na widok podzielony.
+Na koñcu napisy i typowa reklama produktu.
+
+Rowerzysta 1.
+* Wybiera szybk¹ trasê korzystaj¹c z Google Maps.
+* Pojawia siê ostrze¿enie o wje¿d¿aniu do strefy o wysokim ska¿eniu w tym momencie zaczyna siê groŸna muzyka.
+* Co chwilê pojawia siê komunikat "Zanieczyszczenie powietrza, -2hp". Z ka¿dym obra¿eniem ekran robi siê coraz czerwieñszy.
+* Rowerzysta jedzie przez zat³oczone samochodami centrum miasta Wroc³aw.
+* Po dotarciu do celu zostaje mu 5hp, pada na ziemiê i g³oœno dyszy.
+
+Rowerzysta 2.
+* Drugi rowerzysta uruchamia aplikacjê SmogFreeBike, która podpowiada mu d³u¿sz¹ trasê, ale przez park.
+* Podczas jazdy nie pojawiaj¹ siê ostrze¿enia, ekran robi siê zielony, muzyka jest uspokajaj¹ca, pasek ¿ycia nie maleje.
+* Po dotarciu do celu rowerzysta widzi klêcz¹cego rowerzystê, który intensywnie kaszle, a nastêpnie wzywa karetkê.
