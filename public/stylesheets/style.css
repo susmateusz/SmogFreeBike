@@ -21,6 +21,11 @@
     /*height: 110px;*/
     /*padding: 10px;*/
 /*}*/
+.menu-btn{
+    padding-top: 42px;
+    font-family: 'Abril Fatface', cursive;
+    font-size: 32px;
+}
 
 .logo-smog, .logo-free {
     font-family: 'Bungee Outline', cursive;
