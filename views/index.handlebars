@@ -1,16 +1,57 @@
-<h1>SmogFree Bike</h1>
-<label>From:</label><input type="text" id="from-point" value="Marino, Wrocław">
-<label>To:</label><input type="text" id="to-point" value="Plac Grunwaldzki, Wrocław">
-<label>Max AQI:</label><input type="number" id="max-aqi" value=80>
-<button id="find-button" onclick="getSearchingCoordinates()">Find</button><br>
-<label id="warningLabel"></label>
-<div id="map"></div>
-<label>top</label><input type="text" id="top">
-<label>right</label><input type="text" id="right"><br>
-<label>bottom</label><input type="text" id="bottom">
-<label>left</label><input type="text" id="left">
-<div>
-    <ul id="stations"></ul>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <h1 class="logo"><i class="logo-smog">Smog</i><i class="logo-free">Free</i> </br> <i class="logo-bike">Bike</i></h1>
+        </div>
+        <!--<div class="col-md-3">-->
+            <!--Wyszukiwarka-->
+        <!--</div>-->
+        <!--<div class="col-md-3">-->
+            <!--O nas-->
+        <!--</div>-->
+        <!--<div class="col-md-3">-->
+            <!--Kontakt-->
+        <!--</div>-->
+
+    </div>
+    <!--<div class="form-group">-->
+        <div class="row">
+            <div class="col-md-6">
+                <label>From:</label><input type="text" id="from-point" class="form-control" value="Marino, Wrocław">
+            </div>
+
+            <div class="col-md-6">
+                <label>To:</label><input type="text" id="to-point" class="form-control" value="Plac Grunwaldzki, Wrocław">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5">
+                <label>Max AQI:</label><input type="number" id="max-aqi" class="form-control" value=80>
+            </div>
+
+            <div class="col-md-3 find-button-wrapper">
+                <button id="find-button" class="btn btn-success" onclick="getSearchingCoordinates()">
+                    Find <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    <!--</div>-->
+    <!--<br>-->
+    <label id="warningLabel"></label>
+    <div id="map"></div>
+
+
+    <div class="hidden-layer">
+        <label>top</label><input type="text" id="top">
+        <label>right</label><input type="text" id="right"><br>
+        <label>bottom</label><input type="text" id="bottom">
+        <label>left</label><input type="text" id="left">
+        <div>
+            <ul id="stations"></ul>
+        </div>
+    </div>
+
 </div>
 <script type="text/javascript">
     var view = new ol.View({
@@ -24,9 +65,9 @@
     var warningText = "Uwaga, AQI powyżej 150 jest niebezpieczne dla zdrowia!"
     var aqi = 80;
     var stationsList2 = []; // stacje potrzebne do wyliczania wspolczynnika jakosci trasy
-    var iconFeatures=[];
-    var stationFeatures=[];
-    var smogFeatures=[];
+    var iconFeatures = [];
+    var stationFeatures = [];
+    var smogFeatures = [];
     var routeFeatures = [];
     var labelFeatures = [];
 
@@ -114,7 +155,7 @@
             color: 'rgba(0, 0, 0, 0.7)',
             width: 2,
             lineCap: 'square',
-            lineDash: [7,4,7],
+            lineDash: [7, 4, 7],
             lineDashOffset: 10
         })
     });
@@ -125,17 +166,17 @@
             color: [140, 40, 40, 0.8]
         })
     });
-    
 
-    function smogStyleFunction(feature, resolution){
+
+    function smogStyleFunction(feature, resolution) {
         var rank = feature.get('rank');
-        if(+rank < 50){
+        if (+rank < 50) {
             return [lowSmogStyle];
-        } 
-        if(+rank > 200) {
+        }
+        if (+rank > 200) {
             return [lethalSmogStyle];
         }
-        if(+rank > aqi) {
+        if (+rank > aqi) {
             return [dangerousSmogStyle];
         }
         return [mediumSmogStyle];
@@ -169,7 +210,7 @@
         return value - (worlds * 360);
     }
 
-    function getLocForAddress(address){
+    function getLocForAddress(address) {
         return $.ajax({
             type: "GET",
             contentType: "application/json",
@@ -189,17 +230,17 @@
         toAddress = document.getElementById("to-point").value;
         aqi = document.getElementById("max-aqi").value;
         wLabel = document.getElementById('warningLabel');
-        if(aqi > 150){
+        if (aqi > 150) {
             wLabel.innerHTML = warningText;
         } else {
             wLabel.innerHTML = '';
         }
 
-        if(!fromAddress || !toAddress){
+        if (!fromAddress || !toAddress) {
             return 1;
         }
-        $.when(getLocForAddress(fromAddress),getLocForAddress(toAddress))
-                .then(function(resp1, resp2) {
+        $.when(getLocForAddress(fromAddress), getLocForAddress(toAddress))
+                .then(function (resp1, resp2) {
                     var min_lon = parseFloat(Math.min(resp1[0][0].lon, resp2[0][0].lon));
                     var max_lon = parseFloat(Math.max(resp1[0][0].lon, resp2[0][0].lon));
                     var min_lat = parseFloat(Math.min(resp1[0][0].lat, resp2[0][0].lat));
@@ -250,33 +291,33 @@
                             });
                             console.log("hello" + stationsList2.length);
                             var grade = rateRoute(data.route, stationsList2);
-                            console.log("Grade: "+ grade);
+                            console.log("Grade: " + grade);
                             var routeStyle = selectStyle(grade);
                             drawRoute(data.route, routeStyle);
-                            var middle_lat = data.route[data.route.length/2];
-                            var middle_lon = data.route[data.route.length/2 + 1];
+                            var middle_lat = data.route[data.route.length / 2];
+                            var middle_lon = data.route[data.route.length / 2 + 1];
                             drawLabel(middle_lat, middle_lon, grade);
                         },
                         dataType: 'json'
                     });
-        });
+                });
     }
 
     function selectStyle(grade) {
         var color = "";
-        if(grade >= 201) {
+        if (grade >= 201) {
             color = '#FF0000';
         }
-        if(grade >= 151 && grade < 200) {
+        if (grade >= 151 && grade < 200) {
             color = '#FF7F00';
         }
-        if(grade >= 101 && grade < 150) {
+        if (grade >= 101 && grade < 150) {
             color = '#FFFF00';
         }
-        if(grade >= 51 && grade < 100) {
+        if (grade >= 51 && grade < 100) {
             color = '#77AA00';
         }
-        if( grade <= 50) {
+        if (grade <= 50) {
             color = '#00FF00';
         }
         console.log("color: " + color);
@@ -291,15 +332,15 @@
 
     function rateRoute(routes, stations) {
         var distances = new Array(stations.length);
-        for(s = 0; s < stations.length;s++){
+        for (s = 0; s < stations.length; s++) {
             distances[s] = 100000;
             var nearest_p_idx = 0;
-            for(p = 0;p < routes.length - 1; p+=2){
+            for (p = 0; p < routes.length - 1; p += 2) {
                 var lat = routes[p];
-                var lon = routes[p+1];
+                var lon = routes[p + 1];
                 var stat = stations[s];
-                var dist = 1/Math.pow(Math.sqrt(Math.pow(stat["lat"]-lat,2)+Math.pow(stat["lon"]-lon,2)),2);
-                if(dist < distances[s]){
+                var dist = 1 / Math.pow(Math.sqrt(Math.pow(stat["lat"] - lat, 2) + Math.pow(stat["lon"] - lon, 2)), 2);
+                if (dist < distances[s]) {
                     distances[s] = dist;
                     nearest_p_idx = p;
                 }
@@ -307,8 +348,8 @@
         }
         sum = 0.0;
         sumWeights = 0.0;
-        for(s = 0; s < stations.length;s++){
-            if(!isNaN(parseInt(stations[s]["aqi"]))) {
+        for (s = 0; s < stations.length; s++) {
+            if (!isNaN(parseInt(stations[s]["aqi"]))) {
                 console.log(distances[s] + "\t\t" + stations[s]["aqi"]);
                 sum += parseInt(stations[s]["aqi"]) * distances[s];
                 sumWeights += distances[s];
@@ -317,10 +358,10 @@
         return sum / sumWeights;
     }
 
-    function drawLabel(middle_lat, middle_lon, grade){
+    function drawLabel(middle_lat, middle_lon, grade) {
         var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(ol.proj.transform([0.0488567 - 0.003, -0.02275 + 0.00115 ], 'EPSG:4326', 'EPSG:3857')),
-            label:"adsfasdf",
+            geometry: new ol.geom.Point(ol.proj.transform([0.0488567 - 0.003, -0.02275 + 0.00115], 'EPSG:4326', 'EPSG:3857')),
+            label: "adsfasdf",
             name: 'Null Island',
             population: 4000,
             rainfall: 500,
@@ -375,7 +416,7 @@
     }
 
 
-    function drawStations(stationsData){
+    function drawStations(stationsData) {
 
         stationsSource.clear();
         smogSource.clear();
@@ -387,18 +428,16 @@
             var latStation = stationsData["stations"][i]["lat"];
             var rank = stationsData["stations"][i]["aqi"];
 
-            var stat = new ol.geom.Circle(ol.proj.transform([+lonStation, +latStation], 'EPSG:4326','EPSG:3857'), 70)
+            var stat = new ol.geom.Circle(ol.proj.transform([+lonStation, +latStation], 'EPSG:4326', 'EPSG:3857'), 70)
             var stationcr = ol.geom.Polygon.fromCircle(stat);
             var station = new ol.Feature({
-                geometry:
-                    stationcr
+                geometry: stationcr
             });
 
-            var sm = new ol.geom.Circle(ol.proj.transform([+lonStation, +latStation], 'EPSG:4326','EPSG:3857'), 2500)
+            var sm = new ol.geom.Circle(ol.proj.transform([+lonStation, +latStation], 'EPSG:4326', 'EPSG:3857'), 2500)
             var smogcr = ol.geom.Polygon.fromCircle(sm);
             var smog = new ol.Feature({
-                geometry:
-                    smogcr
+                geometry: smogcr
             });
             smogSource.addFeature(smog);
             console.log("rank: " + rank);
@@ -408,18 +447,16 @@
     }
 
     function drawStartAndFinish(lon1, lat1, lon2, lat2) {
-        var cr1 = new ol.geom.Circle(ol.proj.transform([+lon1, +lat1], 'EPSG:4326','EPSG:3857'), 100)
+        var cr1 = new ol.geom.Circle(ol.proj.transform([+lon1, +lat1], 'EPSG:4326', 'EPSG:3857'), 100)
         var start = ol.geom.Polygon.fromCircle(cr1);
         var ico1 = new ol.Feature({
-            geometry:
-                    start
+            geometry: start
         });
 
-        var cr2 = new ol.geom.Circle(ol.proj.transform([+lon2, +lat2], 'EPSG:4326','EPSG:3857'), 100)
+        var cr2 = new ol.geom.Circle(ol.proj.transform([+lon2, +lat2], 'EPSG:4326', 'EPSG:3857'), 100)
         var stop = ol.geom.Polygon.fromCircle(cr2);
         var ico2 = new ol.Feature({
-            geometry:
-                    stop
+            geometry: stop
         });
         locationSource.clear();
         locationSource.addFeature(ico1);
@@ -428,20 +465,20 @@
     }
 
     function drawRoute(shapePoints, style) {
-        for(i = 0; i + 3 < shapePoints.length;i+=2){
+        for (i = 0; i + 3 < shapePoints.length; i += 2) {
             drawRoutes(shapePoints[i],
-                    shapePoints[i+1],
-                    shapePoints[i+2],
-                    shapePoints[i+3],
+                    shapePoints[i + 1],
+                    shapePoints[i + 2],
+                    shapePoints[i + 3],
                     style
             );
         }
     }
-    function drawRoutes(lat1, lon1, lat2, lon2, style){
-        var start = ol.proj.transform([+lon1, +lat1], 'EPSG:4326','EPSG:3857');
-        var end = ol.proj.transform([+lon2, +lat2], 'EPSG:4326','EPSG:3857');
+    function drawRoutes(lat1, lon1, lat2, lon2, style) {
+        var start = ol.proj.transform([+lon1, +lat1], 'EPSG:4326', 'EPSG:3857');
+        var end = ol.proj.transform([+lon2, +lat2], 'EPSG:4326', 'EPSG:3857');
         var icon = new ol.Feature({
-           geometry: new ol.geom.LineString([start,end]),
+            geometry: new ol.geom.LineString([start, end]),
         });
         icon.setStyle(style);
         routesSource.addFeature(icon);
@@ -454,14 +491,14 @@
                 source: new ol.source.OSM()
             }),
             smogLayer
-            ,stationsLayer
-            ,routesLayer
-            ,locationLayer
-            
+            , stationsLayer
+            , routesLayer
+            , locationLayer
+
         ]
         , view: view
     });
 
-    map.on('moveend',onMoveEnd);
+    map.on('moveend', onMoveEnd);
 
 </script>

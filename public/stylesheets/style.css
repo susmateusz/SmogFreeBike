@@ -1,13 +1,44 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+/*body {*/
+  /*padding: 50px;*/
+  /*font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;*/
+  /*background-color: red;*/
+/*}*/
+
+/*a {*/
+  /*color: #00B7FF;*/
+/*}*/
+
+/*#map {*/
+  /*width:400px;*/
+  /*height:400px;*/
+/*}*/
+
+/*h1.logo{*/
+    /*border-width: 5px;*/
+    /*border-style: solid;*/
+    /*border-width: medium;*/
+    /*width: 250px;*/
+    /*height: 110px;*/
+    /*padding: 10px;*/
+/*}*/
+
+.logo-smog, .logo-free {
+    font-family: 'Bungee Outline', cursive;
+    font-style: normal;
 }
 
-a {
-  color: #00B7FF;
+.logo-free {
+    color: green;
 }
 
-#map {
-  width:400px;
-  height:400px;
+.logo-bike{
+    font-family: 'Pacifico', cursive;
+}
+
+.find-button-wrapper{
+    margin-top: 24px;
+}
+
+.hidden-layer{
+    display: none;
 }
