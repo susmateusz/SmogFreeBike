@@ -451,7 +451,7 @@
         var textLevel = getTestLevelForGrade(grade);
         var iconStyle = new ol.style.Style({
             text: new ol.style.Text({
-                text: textLevel + ' (AQI: ' + Math.round(grade,1) + ')',
+                text: textLevel + ' (AQI: ' + grade.toFixed(1).toString() + ')',
                 fill: new ol.style.Fill({color: 'black'}),
                 stroke: new ol.style.Stroke({color: getColorByGrade(grade), width: 2}),
                 offsetX: -20,
