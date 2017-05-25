@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 var exphbs = require('express-handlebars');
 
 var index = require('./routes/index');
+var onas = require('./routes/onas');
+var kontakt = require('./routes/kontakt');
 var aqi = require('./routes/aqi');
 var mapquest = require('./routes/mapquest');
 var users = require('./routes/users');
@@ -28,6 +30,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
+app.use('/onas', onas);
+app.use('/kontakt', kontakt);
 app.use('/aqi',aqi);
 app.use('/mapquest',mapquest);
 app.use('/users', users);
