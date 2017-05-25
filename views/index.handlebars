@@ -338,7 +338,7 @@
                                 });
                                 setTimeout(function(){
                                     //do what you need here
-                                }, 2000);
+                                }, 1000);
                                 var grade = rateRoute(points, stationsList2);
                                 var routeStyle = selectStyle(grade);
                                 drawRoute(points, routeStyle);
@@ -358,9 +358,10 @@
                                 });
                                 setTimeout(function(){
                                     //do what you need here
-                                }, 2000);
+                                }, 1000);
                                 var grade = rateRoute(points, stationsList2);
                                 var routeStyle = selectStyle(grade);
+                                drawRoute(points, routeStyle);
                                 var middle_lat = points[2 * Math.round(points.length / 4)];
                                 var middle_lon = points[2 * Math.round(points.length / 4) + 1];
                                 drawLabel(middle_lat, middle_lon, grade);
@@ -452,10 +453,10 @@
         var iconStyle = new ol.style.Style({
             text: new ol.style.Text({
                 text: textLevel + ' (AQI: ' + grade.toFixed(1).toString() + ')',
-                fill: new ol.style.Fill({color: 'black'}),
-                stroke: new ol.style.Stroke({color: getColorByGrade(grade), width: 2}),
-                offsetX: -20,
-                offsetY: 20,
+                fill: new ol.style.Fill({color: getColorByGrade(grade)}),
+                stroke: new ol.style.Stroke({color: 'black', width: 2}),
+                offsetX: 0,
+                offsetY: 0,
                 scale: 1.5,
                 font: 'bold 11px Arial, Verdana, Helvetica, sans-serif'
             })
