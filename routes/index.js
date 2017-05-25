@@ -8,7 +8,6 @@ router.get('/', function(req, res, next) {
 
 /* GET helloworld. */
 router.get('/helloworld', function(req, res, next) {
-  console.log('Used router!');
   res.render('helloworld', { title: 'Hello, World!' });
 });
 

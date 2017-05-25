@@ -16,13 +16,12 @@ router.get('/routes', function(req, res, next) {
         + "&from=" + coords[1] + "," + coords[0]
         + "&to=" + coords[3] + "," + coords[2]
     ;
-
+    console.log(mapquest_url);
     var coords_parsed = [];
     coords.forEach(function(entry){
        coords_parsed.push(parseInt(entry));
     });
     var center = [(coords[0]+coords[2])/2,(coords[1]+coords[3])/2];
-    console.log("CENTER: " + center);
 
     var callback = function(response) {
         var str = '';
@@ -32,15 +31,12 @@ router.get('/routes', function(req, res, next) {
         });
         //the whole response has been recieved, so we just print it out here
         response.on('end', function () {
-            console.log("MAPQUEST RESPONSE: " + str);
             var routes = JSON.parse(str);
             console.log(routes.route.shape.shapePoints);
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify({route: routes.route.shape.shapePoints }));
         });
     }
-    console.log(coords);
-    console.log("URL: " + mapquest_url);
     https.request(mapquest_url, callback).end();
  });
 

@@ -15,7 +15,6 @@ router.get('/stations', function(req, res, next) {
 
     var aqi_url = aqi_base_url + '?latlng='+ coords + aqi_token;
 
-    console.log('Stations API, request: '+aqi_url);
     callback = function(response) {
         var str = '';
         //another chunk of data has been recieved, so append it to `str`
@@ -24,9 +23,7 @@ router.get('/stations', function(req, res, next) {
         });
         //the whole response has been recieved, so we just print it out here
         response.on('end', function () {
-            console.log(str);
             var stacje = JSON.parse(str).data;
-            console.log(stacje);
             update_stations(stacje, req.query.coords);
             res.setHeader('Content-Type', 'application/json');
             res.send(JSON.stringify({stations:stacje}));
@@ -85,11 +82,6 @@ function update_stations(stations, coords){
 }
 
 function station_fits(station, coords){
-    console.log(station);
-    console.log(coords);
-    console.log(typeof station["lat"]);
-    console.log(station["lat"] > coords[0]);
-    console.log(station["lat"] < coords[2]);
     return (station["lat"] > coords[0] && station["lat"] < coords[2] && station["lon"]>coords[1] && station["lon"]<coords[3]);
 }
 

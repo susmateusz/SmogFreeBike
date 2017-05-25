@@ -204,6 +204,11 @@
         style: routesStyle
     });
 
+    var labelsLayer = new ol.layer.Vector({
+        source: labelsSource,
+        style: routesStyle
+    });
+
     function display(id, value) {
         document.getElementById(id).value = value.toFixed(2);
     }
@@ -217,17 +222,29 @@
         return $.ajax({
             type: "GET",
             contentType: "application/json",
+            crossDomain: true,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             url: "http://nominatim.openstreetmap.org/search?format=json&q=" + address,
             dataType: 'json'
-        })
+        });
     }
 
     var fromAddress;
     var toAddress;
 
+    function getPathForCoords(coords) {
+        setTimeout(function(){}, 2000);
+        return $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            crossDomain: true,
+            url: "http://localhost:3000/mapquest/routes",
+            data: {'coords': coords},
+            dataType: 'json'
+        });
+    }
     function getSearchingCoordinates() {
         fromAddress = document.getElementById("from-point").value;
         toAddress = document.getElementById("to-point").value;
@@ -266,25 +283,23 @@
                             resp2[0][0].lat,
                             style
                     );
-
-                    console.log(coords);
-                    var min_xy = ol.proj.fromLonLat([min_lon, min_lat]);
-                    var max_xy = ol.proj.fromLonLat([max_lon, max_lat]);
+                    var span_lon = max_lon - min_lon;
+                    var span_lat = max_lat - min_lat;
+                    var margin = 0.25;
+                    var min_xy = ol.proj.fromLonLat([min_lon - margin * span_lon, min_lat - margin * span_lat]);
+                    var max_xy = ol.proj.fromLonLat([max_lon + margin * span_lon, max_lat + margin * span_lat]);
                     view.fit(min_xy.concat(max_xy), {
-                        duration: 500,
-                        padding: [15, 15, 15, 15]
+                        duration: 1500,
+                        padding: [20, 20, 20, 20]
                     });
                     routesSource.clear();
-                    console.log("COUNT STATIONS: ");
-                    console.log(stationsList2);
+                    labelsSource.clear();
                     $.ajax({
                         type: "GET",
                         contentType: "application/json",
                         url: "http://localhost:3000/mapquest/routes",
                         data: {'coords': coords},
                         success: function (data) {
-                            console.log("Wysłano start i koniec.");
-                            console.log(data);
                             // rysowanie 1. trasy
                             var style = new ol.style.Style({
                                 stroke: new ol.style.Stroke({
@@ -292,43 +307,112 @@
                                     color: [40, 140, 40, 0.8]
                                 })
                             });
-                            console.log("hello" + stationsList2.length);
                             var grade = rateRoute(data.route, stationsList2);
-                            console.log("Grade: " + grade);
                             var routeStyle = selectStyle(grade);
                             drawRoute(data.route, routeStyle);
-                            var middle_lat = data.route[data.route.length / 2];
-                            var middle_lon = data.route[data.route.length / 2 + 1];
+                            var middle_lat = data.route[2 * Math.round(data.route.length / 4)];
+                            var middle_lon = data.route[2 * Math.round(data.route.length / 4) + 1];
                             drawLabel(middle_lat, middle_lon, grade);
+
+                            //alternative route
+                            // var coords = [resp1[0][0].lon, resp1[0][0].lat, resp2[0][0].lon, resp2[0][0].lat];
+                            var x1 = parseFloat(resp1[0][0].lon);
+                            var y1 = parseFloat(resp1[0][0].lat);
+                            var x2 = parseFloat(resp2[0][0].lon);
+                            var y2 = parseFloat(resp2[0][0].lat);
+                            // ścieżka alternatywna nr 1
+                            var p5 = [(y1 - y2 + x1 + x2)/2,(y1 + y2 - x1 + x2)/2];
+                            var p6 = [(-y1 + y2 + x1 + x2)/2,(y1 + y2 + x1 - x2)/2];
+                            var coords_0_5 = [x1.toString(), y1.toString(), p5[0].toString(), p5[1].toString()];
+                            var coords_5_1 = [p5[0].toString(), p5[1].toString(), x2.toString(), y2.toString()];
+                            var coords_0_6 = [x1.toString(), y1.toString(), p6[0].toString(), p6[1].toString()];
+                            var coords_6_1 = [p6[0].toString(), p6[1].toString(), x2.toString(), y2.toString()];
+                            $.when(getPathForCoords(coords_0_5), getPathForCoords(coords_5_1)).then(function(data05, data51){
+                                var points = data05[0].route.concat(data51[0].route);
+                                // rysowanie 1. trasy
+                                var style = new ol.style.Style({
+                                    stroke: new ol.style.Stroke({
+                                        width: 6,
+                                        color: [40, 140, 40, 0.8]
+                                    })
+                                });
+                                setTimeout(function(){
+                                    //do what you need here
+                                }, 2000);
+                                var grade = rateRoute(points, stationsList2);
+                                var routeStyle = selectStyle(grade);
+                                drawRoute(points, routeStyle);
+                                var middle_lat = points[2 * Math.round(points.length / 4)];
+                                var middle_lon = points[2 * Math.round(points.length / 4) + 1];
+                                drawLabel(middle_lat, middle_lon, grade);
+                            });
+                            $.when(getPathForCoords(coords_0_6), getPathForCoords(coords_6_1)).then(function(data05, data51){
+                                var points = data05[0].route.concat(data51[0].route);
+                                    points.concat(data51[0].route);
+                                // rysowanie 1. trasy
+                                var style = new ol.style.Style({
+                                    stroke: new ol.style.Stroke({
+                                        width: 6,
+                                        color: [40, 140, 40, 0.8]
+                                    })
+                                });
+                                setTimeout(function(){
+                                    //do what you need here
+                                }, 2000);
+                                var grade = rateRoute(points, stationsList2);
+                                var routeStyle = selectStyle(grade);
+                                var middle_lat = points[2 * Math.round(points.length / 4)];
+                                var middle_lon = points[2 * Math.round(points.length / 4) + 1];
+                                drawLabel(middle_lat, middle_lon, grade);
+                            });
+
                         },
                         dataType: 'json'
                     });
+
                 });
     }
 
-    function selectStyle(grade) {
+    function getTestLevelForGrade(grade) {
+        var text = "";
+        if (grade <= 50) {
+            text = 'dobra';
+        }
+        if (grade > 50 && grade <= 200) {
+            text = 'słaba';
+        }
+        if (grade > 200) {
+            text = 'niebezpieczna';
+        }
+        if (grade >= aqi) {
+            text = 'niedopuszczalna';
+        }
+        return text;
+    }
+
+    function getColorByGrade(grade) {
         var color = "";
-        if (grade >= 201) {
-            color = '#FF0000';
+        if (grade > 200) {
+            color = '#C80000';
         }
-        if (grade >= 151 && grade < 200) {
-            color = '#FF7F00';
-        }
-        if (grade >= 101 && grade < 150) {
-            color = '#FFFF00';
-        }
-        if (grade >= 51 && grade < 100) {
-            color = '#77AA00';
+        if (grade > 50 && grade <= 200) {
+            color = '#FFB400';
         }
         if (grade <= 50) {
             color = '#00FF00';
         }
-        console.log("color: " + color);
+        if (grade >= aqi) {
+            color = '#FF0000';
+        }
+        return color;
+    }
+    function selectStyle(grade) {
+        var color = getColorByGrade(grade);
         return new ol.style.Style({
             stroke: new ol.style.Stroke({
                 width: 6,
                 color: color
-            })
+            }),
         });
 
     }
@@ -353,7 +437,6 @@
         sumWeights = 0.0;
         for (s = 0; s < stations.length; s++) {
             if (!isNaN(parseInt(stations[s]["aqi"]))) {
-                console.log(distances[s] + "\t\t" + stations[s]["aqi"]);
                 sum += parseInt(stations[s]["aqi"]) * distances[s];
                 sumWeights += distances[s];
             }
@@ -363,13 +446,23 @@
 
     function drawLabel(middle_lat, middle_lon, grade) {
         var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(ol.proj.transform([0.0488567 - 0.003, -0.02275 + 0.00115], 'EPSG:4326', 'EPSG:3857')),
-            label: "adsfasdf",
-            name: 'Null Island',
-            population: 4000,
-            rainfall: 500,
-
+            geometry: new ol.geom.Point(ol.proj.transform([+middle_lon,+middle_lat], 'EPSG:4326', 'EPSG:3857')),
         });
+        var textLevel = getTestLevelForGrade(grade);
+        var iconStyle = new ol.style.Style({
+            text: new ol.style.Text({
+                text: textLevel + ' (AQI: ' + Math.round(grade,1) + ')',
+                fill: new ol.style.Fill({color: 'black'}),
+                stroke: new ol.style.Stroke({color: getColorByGrade(grade), width: 2}),
+                offsetX: -20,
+                offsetY: 20,
+                scale: 1.5,
+                font: 'bold 11px Arial, Verdana, Helvetica, sans-serif'
+            })
+        });
+        iconFeature.setStyle(iconStyle);
+        labelsSource.addFeature(iconFeature);
+
     }
 
     function onMoveEnd(evt) {
@@ -389,7 +482,13 @@
         coords.push(wrapLon(bottomLeft[0]));
         coords.push(topRight[1]);
         coords.push(wrapLon(topRight[0]));
-
+        var span_lon = coords[3] - coords[1];
+        var span_lat = coords[2] - coords[0];
+        var margin = 0.25;
+        coords[0] -= margin * span_lat;
+        coords[1] -= margin * span_lon;
+        coords[2] += margin * span_lat;
+        coords[3] += margin * span_lon;
         $.ajax({
             type: "GET",
             contentType: "application/json",
@@ -408,8 +507,6 @@
                     item.appendChild(document.createTextNode(station));
                     ul_stations.appendChild(item);
                 }
-                console.log("Settings stations: ");
-                console.log(data);
                 stationsList2 = data["stations"];
                 drawStations(data);
 
@@ -443,7 +540,6 @@
                 geometry: smogcr
             });
             smogSource.addFeature(smog);
-            console.log("rank: " + rank);
             smog.set('rank', rank)
             stationsSource.addFeature(station);
         }
@@ -497,6 +593,7 @@
             , stationsLayer
             , routesLayer
             , locationLayer
+            , labelsLayer
 
         ]
         , view: view
