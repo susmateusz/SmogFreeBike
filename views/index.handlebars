@@ -314,7 +314,7 @@
                                 })
                             });
                             var grade = rateRoute(data.route, stationsList2);
-                            var routeStyle = selectStyle(grade);
+                            var routeStyle = selectStyle(grade, 0);
                             drawRoute(data.route, routeStyle);
                             var middle_lat = data.route[2 * Math.round(data.route.length / 4)];
                             var middle_lon = data.route[2 * Math.round(data.route.length / 4) + 1];
@@ -346,7 +346,7 @@
                                     //do what you need here
                                 }, 1000);
                                 var grade = rateRoute(points, stationsList2);
-                                var routeStyle = selectStyle(grade);
+                                var routeStyle = selectStyle(grade, 1);
                                 drawRoute(points, routeStyle);
                                 var middle_lat = points[2 * Math.round(points.length / 4)];
                                 var middle_lon = points[2 * Math.round(points.length / 4) + 1];
@@ -366,7 +366,7 @@
                                     //do what you need here
                                 }, 1000);
                                 var grade = rateRoute(points, stationsList2);
-                                var routeStyle = selectStyle(grade);
+                                var routeStyle = selectStyle(grade, 2);
                                 drawRoute(points, routeStyle);
                                 var middle_lat = points[2 * Math.round(points.length / 4)];
                                 var middle_lon = points[2 * Math.round(points.length / 4) + 1];
@@ -413,13 +413,23 @@
         }
         return color;
     }
-    function selectStyle(grade) {
+    function selectStyle(grade, level) {
         var color = getColorByGrade(grade);
+        var color = color.slice(0, -2);
+        if(level == 0) {
+            color = color + "00";
+        } else if (level == 1) {
+            color = color + "80";
+        } else {
+            color = color + "FF";
+        }
+        console.log("KOLOR: " + color);
         return new ol.style.Style({
             stroke: new ol.style.Stroke({
-                width: 6,
+                width: 5,
                 color: color
             }),
+            zIndex: 3
         });
 
     }
@@ -448,7 +458,13 @@
                 sumWeights += distances[s];
             }
         }
-        return sum / sumWeights;
+        var result = sum / sumWeights;
+        if (isNaN(result)) {
+            return 50.0;
+        }
+        else {
+            return result;
+        }
     }
 
     function drawLabel(middle_lat, middle_lon, grade) {
@@ -586,7 +602,14 @@
         var icon = new ol.Feature({
             geometry: new ol.geom.LineString([start, end]),
         });
-        icon.setStyle(style);
+        var shadowStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: [0, 0, 0, 0.5],
+                width: 10
+            }),
+            zIndex: 2
+        });
+        icon.setStyle([style, shadowStyle]);
         routesSource.addFeature(icon);
     }
 
