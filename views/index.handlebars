@@ -1,7 +1,8 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-3">
-            <h1 class="logo"><i class="logo-smog">Smog</i><i class="logo-free">Free</i> </br> <i class="logo-bike">Bike</i></h1>
+            <h1 class="logo"><i class="logo-smog">Smog</i><i class="logo-free">Free</i> </br> <i
+                    class="logo-bike">Bike</i></h1>
         </div>
         <div class="col-md-3">
             <div class="menu-btn" onclick="window.location.href='/'">
@@ -21,49 +22,109 @@
     </div>
     <hr/>
     <div class="col-md-8">
-        <p>Aplikacja RowerFreeBike stworzona została z myślą o rowerzystach, którzy rzeczywiście chcą dbać o swoje zdrowie. Możesz tutaj wyszukiwać trasy rowerowe oraz podglądać czekające cie na nich poziomy zanieczyszczeń. Dla każdej trasy obliczany jest średni współczynnik jakości powietrza, jaki czeka cię na tej trasie.</p>
-        <p>Jeżeli chcesz własnoręcznie ustalić dopuszczalny dla Ciebie próg zanieczyszczeń, wprowadź odpowiednią wartość w pole "Max AQI". Im większa wartość współczynnika AQI, tym jakość powietrza na trasie jest gorsza.</p>
+        <p>Aplikacja RowerFreeBike stworzona została z myślą o rowerzystach, którzy rzeczywiście chcą dbać o swoje
+            zdrowie. Możesz tutaj wyszukiwać trasy rowerowe oraz podglądać czekające cie na nich poziomy zanieczyszczeń.
+            Dla każdej trasy obliczany jest średni współczynnik jakości powietrza, jaki czeka cię na tej trasie.</p>
+        <p>Jeżeli chcesz własnoręcznie ustalić dopuszczalny dla Ciebie próg zanieczyszczeń, wprowadź odpowiednią wartość
+            w pole "Max AQI". Im większa wartość współczynnika AQI, tym jakość powietrza na trasie jest gorsza.</p>
 
     </div>
     <hr/>
     <!--<div class="form-group">-->
-        <div class="row">
-            <div class="col-md-6">
-                <label>From:</label><input type="text" id="from-point" class="form-control" value="Marino, Wrocław">
-            </div>
-
-            <div class="col-md-6">
-                <label>To:</label><input type="text" id="to-point" class="form-control" value="Plac Grunwaldzki, Wrocław">
-            </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label>From:</label><input type="text" id="from-point" class="form-control" value="Marino, Wrocław">
         </div>
 
-        <div class="row">
-            <div class="col-md-2">
-                <label>Max AQI:</label><input type="number" id="max-aqi" class="form-control" value=80>
-            </div>
+        <div class="col-md-6">
+            <label>To:</label><input type="text" id="to-point" class="form-control" value="Plac Grunwaldzki, Wrocław">
+        </div>
+    </div>
 
-            <div class="col-md-4 find-button-wrapper">
-                <button id="find-button" class="btn btn-success btn-block" onclick="getSearchingCoordinates()">
-                    Find <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                </button>
+    <div class="row">
+        <div class="col-md-2">
+            <label>Max AQI:</label><input type="number" id="max-aqi" class="form-control" value=80>
+        </div>
+
+        <div class="col-md-4 find-button-wrapper">
+            <button id="find-button" class="btn btn-success btn-block" onclick="getSearchingCoordinates()">
+                Find <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span4 collapse-group">
+            <h2>Chcesz wiedzieć więcej o wskaźnikach AQI?</h2>
+            <a class="btn kliknij" href="#" style="font-size:30px;">Kliknij, aby dowiedzieć się więcej.</a>
+            <div id="zwijane" class="collapse" style="font-size:150%;">
+                AQI (ang. Air Quality Index) - Indeks Jakości Powietrza. Ogólny wskaźnik ustanowiony normą US-EPA 2016, którego celem jest ocena jakości powietrza.
+                Im wskaźnik jest niższy, tym powietrze jest czystsze. W celu uzyskania dokładniejszych informacji
+                odsyłamy pod link <a href="http://aqicn.org/scale/">http://aqicn.org/scale/</a>.<br />
+                <table class="infoaqitable cautionary">
+                    <thead>
+                    <tr>
+                        <td>AQI</td>
+                        <td>Poziom jakości powietrza</td>
+                        <td>Wpływ na zdrowie</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr style="background-color:#009966;">
+                        <td class="aqiwtxt" nowrap="true">0 - 50</td>
+                        <td class="aqiwtxt">Dobry</td>
+                        <td class="aqiwtxt">Satysfakcjonująca jakość powietrza, brak lub niskie ryzyko.
+                        </td>
+                    </tr>
+                    <tr style="background-color:#ffde33" class="aqibtxt">
+                        <td class="aqibtxt" nowrap="true">51 -100</td>
+                        <td class="aqibtxt">Średni</td>
+                        <td class="aqibtxt">Jakość powietrza jest akceptowalna, aczkolwiek dla osób wrażliwych może być
+                            dla osób szczególnie narażonych(dzieci, kobiety w ciąży) może okazać się niekorzystny.
+                        </td>
+                    </tr>
+                    <tr style="background-color:#ff9933;">
+                        <td class="aqibtxt" nowrap="true">101-150</td>
+                        <td class="aqibtxt">Niezdrowy dla wrażliwych</td>
+                        <td class="aqibtxt">Osoby szczególnie narażone mogą doświadczać problemów zdrowotnych.
+                            Nie powinno mieć wpływu na zdrowie większości ludzi.
+                        </td>
+                    </tr>
+                    <tr style="background-color:#cc0033;color:white;">
+                        <td class="aqiwtxt" nowrap="true">151-200</td>
+                        <td class="aqiwtxt">Niezdrowy</td>
+                        <td class="aqiwtxt">Każdy może doświadczać problemów zdrowotnych. Powietrze może okazać się groźne
+                            dla osób szczególnie wrażliwych.
+                        </td>
+                    </tr>
+                    <tr style="background-color:#660099;color:white;">
+                        <td class="aqiwtxt" nowrap="true">201-300</td>
+                        <td class="aqiwtxt">Bardzo niezdrowy</td>
+                        <td class="aqiwtxt">Ostrzeżenie o szkodliwości zanieczyszczeń dla wszystkich ludzi.
+                        </td>
+                    </tr>
+                    <tr style="background-color:#7e0023;color:white;">
+                        <td class="aqiwtxt" nowrap="true">300+</td>
+                        <td class="aqiwtxt">Groźny</td>
+                        <td class="aqiwtxt">Groźny dla zdrowia, należy pozostać w domach lub opuścić teren.</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div class="row">
-            <div class="span4 collapse-group">
-                <h2>Chcesz wiedzieć więcej o wskaźnikach AQI?<a class="btn" href="#">Kliknij tutaj!</a></h2>
-                <p class="collapse">
-                    Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-
-                </p>
-
-            </div>
-        </div>
+    </div>
     <script type="text/javascript">
-        $('.row .btn').on('click', function(e) {
+        $('.kliknij').on('click', function (e) {
             e.preventDefault();
             var $this = $(this);
             var $collapse = $this.closest('.collapse-group').find('.collapse');
             $collapse.collapse('toggle');
+        });
+        $('#zwijane').on('shown.bs.collapse', function () {
+            $('.kliknij').text('Kliknij, aby ukryć.');
+        });
+
+        $('#zwijane').on('hidden.bs.collapse', function () {
+            $('.kliknij').text('Kliknij, aby dowiedzieć się więcej.');
         });
     </script>
     <!--</div>-->
@@ -259,7 +320,8 @@
     var toAddress;
 
     function getPathForCoords(coords) {
-        setTimeout(function(){}, 2000);
+        setTimeout(function () {
+        }, 2000);
         return $.ajax({
             type: "GET",
             contentType: "application/json",
@@ -345,13 +407,13 @@
                             var x2 = parseFloat(resp2[0][0].lon);
                             var y2 = parseFloat(resp2[0][0].lat);
                             // ścieżka alternatywna nr 1
-                            var p5 = [(y1 - y2 + x1 + x2)/2,(y1 + y2 - x1 + x2)/2];
-                            var p6 = [(-y1 + y2 + x1 + x2)/2,(y1 + y2 + x1 - x2)/2];
+                            var p5 = [(y1 - y2 + x1 + x2) / 2, (y1 + y2 - x1 + x2) / 2];
+                            var p6 = [(-y1 + y2 + x1 + x2) / 2, (y1 + y2 + x1 - x2) / 2];
                             var coords_0_5 = [x1.toString(), y1.toString(), p5[0].toString(), p5[1].toString()];
                             var coords_5_1 = [p5[0].toString(), p5[1].toString(), x2.toString(), y2.toString()];
                             var coords_0_6 = [x1.toString(), y1.toString(), p6[0].toString(), p6[1].toString()];
                             var coords_6_1 = [p6[0].toString(), p6[1].toString(), x2.toString(), y2.toString()];
-                            $.when(getPathForCoords(coords_0_5), getPathForCoords(coords_5_1)).then(function(data05, data51){
+                            $.when(getPathForCoords(coords_0_5), getPathForCoords(coords_5_1)).then(function (data05, data51) {
                                 var points = data05[0].route.concat(data51[0].route);
                                 // rysowanie 1. trasy
                                 var style = new ol.style.Style({
@@ -360,7 +422,7 @@
                                         color: [40, 140, 40, 0.8]
                                     })
                                 });
-                                setTimeout(function(){
+                                setTimeout(function () {
                                     //do what you need here
                                 }, 1000);
                                 var grade = rateRoute(points, stationsList2);
@@ -370,9 +432,9 @@
                                 var middle_lon = points[2 * Math.round(points.length / 4) + 1];
                                 drawLabel(middle_lat, middle_lon, grade);
                             });
-                            $.when(getPathForCoords(coords_0_6), getPathForCoords(coords_6_1)).then(function(data05, data51){
+                            $.when(getPathForCoords(coords_0_6), getPathForCoords(coords_6_1)).then(function (data05, data51) {
                                 var points = data05[0].route.concat(data51[0].route);
-                                    points.concat(data51[0].route);
+                                points.concat(data51[0].route);
                                 // rysowanie 1. trasy
                                 var style = new ol.style.Style({
                                     stroke: new ol.style.Stroke({
@@ -380,7 +442,7 @@
                                         color: [40, 140, 40, 0.8]
                                     })
                                 });
-                                setTimeout(function(){
+                                setTimeout(function () {
                                     //do what you need here
                                 }, 1000);
                                 var grade = rateRoute(points, stationsList2);
@@ -434,7 +496,7 @@
     function selectStyle(grade, level) {
         var color = getColorByGrade(grade);
         var color = color.slice(0, -2);
-        if(level == 0) {
+        if (level == 0) {
             color = color + "00";
         } else if (level == 1) {
             color = color + "80";
@@ -487,7 +549,7 @@
 
     function drawLabel(middle_lat, middle_lon, grade) {
         var iconFeature = new ol.Feature({
-            geometry: new ol.geom.Point(ol.proj.transform([+middle_lon,+middle_lat], 'EPSG:4326', 'EPSG:3857')),
+            geometry: new ol.geom.Point(ol.proj.transform([+middle_lon, +middle_lat], 'EPSG:4326', 'EPSG:3857')),
         });
         var textLevel = getTestLevelForGrade(grade);
         var iconStyle = new ol.style.Style({
