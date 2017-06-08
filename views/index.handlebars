@@ -246,7 +246,7 @@
             type: "GET",
             contentType: "application/json",
             crossDomain: true,
-            url: "http://localhost:3000/mapquest/routes",
+            url: "/mapquest/routes",
             data: {'coords': coords},
             dataType: 'json'
         });
@@ -303,7 +303,7 @@
                     $.ajax({
                         type: "GET",
                         contentType: "application/json",
-                        url: "http://localhost:3000/mapquest/routes",
+                        url: "/mapquest/routes",
                         data: {'coords': coords},
                         success: function (data) {
                             // rysowanie 1. trasy
@@ -499,7 +499,7 @@
         $.ajax({
             type: "GET",
             contentType: "application/json",
-            url: "http://localhost:3000/aqi/stations",
+            url: "/aqi/stations",
             data: {'coords': coords},
             //data: {'coords' : 'hallo!'},
             success: function (data) {
