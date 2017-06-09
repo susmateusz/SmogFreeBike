@@ -42,11 +42,14 @@
     </div>
 
     <div class="row">
-        <div class="col-md-2">
-            <label>Max AQI:</label><input type="number" id="max-aqi" class="form-control" value=80>
+        <div class="col-md-4">
+            <label>Max AQI: <a id="max-aqi-value">80</a> <a id="max-aqi-label">Średnia jakość</a></label>
+            <input type="range"  id="max-aqi" class="form-control" value=80 onchange="changeAQI()" min="0" max="500">
+
+            <!--<input type="number" id="max-aqi" class="form-control" value=80>-->
         </div>
 
-        <div class="col-md-4 find-button-wrapper">
+        <div class="col-md-2 find-button-wrapper">
             <button id="find-button" class="btn btn-success btn-block" onclick="getSearchingCoordinates()">
                 Find <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
             </button>
@@ -301,6 +304,29 @@
     function wrapLon(value) {
         var worlds = Math.floor((value + 180) / 360);
         return value - (worlds * 360);
+    }
+
+    function changeAQI(){
+        console.log("hhjkhjkhjk")
+        var newValue = document.getElementById("max-aqi").value;
+        document.getElementById("max-aqi-value").innerText = newValue;
+        if(newValue < 50){
+            document.getElementById("max-aqi-label").innerText = "Dobra jakość"
+        } else if(newValue > 50 && newValue < 100){
+            document.getElementById("max-aqi-label").innerText = "Średnia jakość"
+        } else if(newValue > 100 && newValue < 150){
+            document.getElementById("max-aqi-label").innerText = "Niezdrowe dla wrażliwych osób"
+        } else if(newValue > 150 && newValue < 200){
+            document.getElementById("max-aqi-label").innerText = "Niezdrowe"
+        } else if(newValue > 200 && newValue < 300){
+            document.getElementById("max-aqi-label").innerText = "Bardzo niezdrowe"
+        } else if(newValue > 300){
+            document.getElementById("max-aqi-label").innerText = "Śmiertelne"
+        }
+        //And Nothing else matters!
+
+
+
     }
 
     function getLocForAddress(address) {
